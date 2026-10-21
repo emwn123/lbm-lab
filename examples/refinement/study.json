@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "ny": 16,
+      "speed": 0.04,
+      "steps": 100,
+      "reynolds": 6.399999999999999,
+      "viscous_time": 0.03906250000000001,
+      "relative_l2_error": 0.020873955172022635,
+      "nu_relative_error": 0.008328745751994715,
+      "case_passed": false
+    },
+    {
+      "ny": 32,
+      "speed": 0.02,
+      "steps": 400,
+      "reynolds": 6.399999999999999,
+      "viscous_time": 0.03906250000000001,
+      "relative_l2_error": 0.005224856626175854,
+      "nu_relative_error": 0.0020625993409930654,
+      "case_passed": true
+    },
+    {
+      "ny": 64,
+      "speed": 0.01,
+      "steps": 1600,
+      "reynolds": 6.399999999999999,
+      "viscous_time": 0.03906250000000001,
+      "relative_l2_error": 0.0013066222094031367,
+      "nu_relative_error": 0.0005144427566319276,
+      "case_passed": true
+    }
+  ],
+  "observed_profile_orders": [
+    1.9982406322676032,
+    1.9995493817762122
+  ],
+  "error_decreases": true
+}

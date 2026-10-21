@@ -1,0 +1,25 @@
+{
+  "case": "couette",
+  "steps": 9500,
+  "nu_input": 0.10000000000000002,
+  "profile_relative_l2_error": 6.546677571610593e-08,
+  "last_checkpoint_velocity_change": 9.976971679370727e-09,
+  "steady_converged": true,
+  "max_sampled_relative_mass_drift": 6.27831120425526e-13,
+  "max_sampled_mach": 0.03391932819381102,
+  "final": {
+    "mass": 191.9999999998795,
+    "rho_min": 0.9999999999993711,
+    "rho_max": 0.999999999999373,
+    "mach_max": 0.03391932819381102,
+    "kinetic_energy": 0.012794443137054435,
+    "uy_max_abs": 4.46170878021515e-15
+  },
+  "criteria": {
+    "profile_error": true,
+    "mass": true,
+    "low_mach": true,
+    "steady": true
+  },
+  "passed": true
+}

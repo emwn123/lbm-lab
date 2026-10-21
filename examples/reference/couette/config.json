@@ -1,0 +1,14 @@
+{
+  "case": "couette",
+  "ny": 24,
+  "nx": 8,
+  "tau": 0.8,
+  "speed": 0.02,
+  "force_density_x": 0.0,
+  "max_steps": 20000,
+  "wave_steps": 400,
+  "check_every": 100,
+  "steady_tolerance": 1e-08,
+  "python": "3.14.0",
+  "numpy": "2.5.4"
+}

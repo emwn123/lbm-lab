@@ -1,0 +1,30 @@
+{
+  "case": "shear-wave",
+  "steps": 100,
+  "nu_input": 0.10000000000000002,
+  "profile_relative_l2_error": 0.020873955172022635,
+  "last_checkpoint_velocity_change": 0.03456216774737242,
+  "steady_converged": null,
+  "max_sampled_relative_mass_drift": 7.105427357601002e-15,
+  "max_sampled_mach": 0.06795079747896343,
+  "final": {
+    "mass": 127.99999999999909,
+    "rho_min": 0.9999999999999923,
+    "rho_max": 0.9999999999999936,
+    "mach_max": 0.014233001150588325,
+    "kinetic_energy": 0.002246331327416943,
+    "uy_max_abs": 2.4286128663675477e-16
+  },
+  "nu_fitted": 0.1008328745751995,
+  "nu_relative_error": 0.008328745751994715,
+  "fit_start_step": 20,
+  "fit_end_step": 100,
+  "fit_log_intercept": -3.227126748289517,
+  "criteria": {
+    "profile_error": false,
+    "mass": true,
+    "low_mach": true,
+    "viscosity": true
+  },
+  "passed": false
+}
