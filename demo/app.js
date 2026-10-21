@@ -9,6 +9,29 @@ const cases={
   couette:{en:["The top wall moves; the bottom wall stays still.","Top-wall speed","The steady profile should be linear. The walls lie half a lattice spacing beyond the first and last fluid nodes, so the channel height is N, not N − 1."],zh:["上壁运动，下壁静止。","上壁速度","稳态速度剖面应为直线。壁面在首末流体节点之外半格点处，因此通道宽度为 N，而不是 N−1。"]},
   "shear-wave":{en:["A sinusoidal velocity decays in a fully periodic domain.","Initial wave amplitude","Viscosity controls the exponential decay rate. Compare the fitted viscosity with (tau − 0.5)/3. A coarse grid can conserve mass and still miss the profile-error criterion."],zh:["正弦速度波在全周期区域内逐渐衰减。","初始波振幅","黏度决定指数衰减率。可将拟合黏度与 (tau−0.5)/3 比较。粗网格即使质量守恒，也可能未达到剖面误差要求。"]}}
 ;
+Object.assign(words.en,{vortex:"The error uses both velocity components over the full 2D grid. The profile is a slice at x = 0.5; energy is density-weighted.",energy:"Energy",velocityField:"2D velocity",energyTitle:"Kinetic energy decay"});
+Object.assign(words.zh,{vortex:"误差使用整个二维网格上的两个速度分量。剖面取 x=0.5 的切片；动能按密度加权。",energy:"动能",velocityField:"二维速度",energyTitle:"动能衰减"});
+cases["taylor-green"]={en:["A square periodic domain contains four decaying vortices.","Initial velocity amplitude","Both velocity components vary in x and y. Compare the full velocity field and kinetic energy with the continuum reference. Pressure-consistent density reduces acoustic startup, but this remains a weakly compressible approximation."],zh:["正方形周期域内的四个涡旋逐渐衰减。","初始速度振幅","两个速度分量均随 x 和 y 变化。比较整个速度场和动能，而不只看剖面。初始密度与解析压力相匹配，但模型仍是弱可压缩近似。"]};
+const activities=[
+  {case:"couette",en:["01 · Move the wall","Run at speed 0.02, then 0.04. What changes in the steady profile?","The slope and velocity double; the profile stays linear."],zh:["01 · 移动壁面","分别使用速度 0.02 与 0.04。稳态速度剖面如何变化？","斜率与速度加倍，剖面仍为直线。"]},
+  {case:"poiseuille",en:["02 · Resolve the walls","Compare N=16 and N=32. Check the error, not just the curve overlap.","For this straight channel, profile error is expected to decrease approximately as N⁻². Use the Python study to match Reynolds number."],zh:["02 · 加密壁面附近的网格","比较 N=16 与 N=32。除了曲线重合，还要查看误差。","该直通道的剖面误差预期约按 N⁻² 下降。严格匹配 Reynolds 数的对比可运行 Python 研究。"]},
+  {case:"shear-wave",en:["03 · Change viscosity","At N=32, compare tau=0.8 and tau=1.1. Which wave decays faster?","The viscosity doubles from 0.1 to 0.2, so the continuum amplitude decay rate doubles."],zh:["03 · 改变黏度","N=32 时比较 tau=0.8 与 tau=1.1。哪个波衰减更快？","黏度从 0.1 加倍到 0.2，连续方程的振幅衰减率也加倍。"]},
+  {case:"taylor-green",en:["04 · Follow the vortices","Inspect the velocity arrows and energy history. If velocity amplitude halves, what happens to kinetic energy?","Kinetic energy is quadratic in velocity, so it becomes one quarter. For this continuum solution, E(t) decays as exp(-4 nu k² t)."],zh:["04 · 跟踪涡旋","查看速度箭头与动能历史。速度振幅减半时，动能会怎样？","动能与速度平方成正比，因此降为四分之一。该解析解的动能按 exp(-4 nu k² t) 衰减。"]}
+];
+function renderActivities(){
+  $("activity-cards").replaceChildren();
+  for(const activity of activities){
+    const content=activity[language], card=document.createElement("article");
+    const heading=document.createElement("h3");heading.textContent=content[0];
+    const task=document.createElement("p");task.textContent=content[1];
+    const button=document.createElement("button");button.className="quiet";button.dataset.preset=activity.case;button.disabled=!!worker;
+    button.textContent=language==="en"?"Set up this experiment":"设置此实验";
+    button.addEventListener("click",()=>{if(worker)return;$("case").value=activity.case;$("ny").value="32";$("tau").value="0.8";$("speed").value="0.02";$("case").dispatchEvent(new Event("input"));$("run").focus();});
+    const details=document.createElement("details"),summary=document.createElement("summary"),answer=document.createElement("p");
+    summary.textContent=language==="en"?"Expected behavior":"预期结果";answer.textContent=content[2];details.append(summary,answer);
+    card.append(heading,task,button,details);$("activity-cards").append(card);
+  }
+}
 function text(){return words[language];}
 function translate(){
   document.documentElement.lang=language==="en"?"en":"zh-CN";
@@ -16,6 +39,11 @@ function translate(){
   $("language").textContent=language==="en"?"中文":"English";
   const info=cases[$("case").value][language];
   $("description").textContent=info[0]; $("speed-label").textContent=info[1]; $("lesson").textContent=info[2];
+  const vortex=$("case").value==="taylor-green";
+  $("geometry").textContent=vortex?(language==="en"?"Square N × N grid · periodic x and y · lattice units":"N×N 正方形网格 · x、y 周期边界 · 格子单位"):(language==="en"?"8 nodes along x · lattice units":"x 方向 8 个节点 · 格子单位");
+  $("profile-title").textContent=vortex?(language==="en"?"Velocity slice at x = 0.5":"x=0.5 的速度切片"):(language==="en"?"Velocity profile":"速度剖面");
+  $("decay-title").textContent=vortex?text().energyTitle:(language==="en"?"Amplitude decay":"振幅衰减");
+  renderActivities();
   if(lastSample) render(lastSample); else {$("status").textContent=text().ready; drawEmpty();}
 }
 function config(){return {case:$("case").value,ny:Number($("ny").value),tau:Number($("tau").value),speed:Number($("speed").value)};}
@@ -27,6 +55,7 @@ function updateValues(){
 function setBusy(busy){
   ["case","ny","tau","speed","run"].forEach(id=>$(id).disabled=busy);
   $("stop").disabled=!busy; $("download").disabled=busy || !result;
+  document.querySelectorAll("[data-preset]").forEach(el=>el.disabled=busy);
 }
 function chart(svg, xValues, yValues, xLabel, yLabel, series, height=330){
   const left=67, right=22, top=24, bottom=48, width=700;
@@ -54,6 +83,27 @@ function drawEmpty(){
   chart($("profile"),[-.01,.02],[0,1],"uₓ · lattice units","y / H",[]);
   $("explanation").textContent=language==="en"?"Choose a case and run the experiment.":"选择算例后点击运行。";
   $("wave-section").hidden=true;
+  $("field-section").hidden=true;
+}
+function drawField(sample){
+  const canvas=$("field"),ctx=canvas.getContext("2d"),n=activeConfig.ny;
+  const left=130,top=18,side=350,cell=side/n,max=activeConfig.speed;
+  ctx.clearRect(0,0,700,420);
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+    const p=y*n+x,v=Math.min(1,Math.hypot(sample.ux[p],sample.uy[p])/max);
+    ctx.fillStyle=`rgb(${Math.round(25+205*v)},${Math.round(50+155*v)},${Math.round(85-35*v)})`;
+    ctx.fillRect(left+x*cell,top+(n-1-y)*cell,cell+.5,cell+.5);
+  }
+  const scale=sample.ux.reduce((m,u,p)=>Math.max(m,Math.hypot(u,sample.uy[p])),1e-30);
+  const stride=Math.max(1,Math.floor(n/8));ctx.strokeStyle="white";ctx.lineWidth=1.1;
+  for(let y=Math.floor(stride/2);y<n;y+=stride)for(let x=Math.floor(stride/2);x<n;x+=stride){
+    const p=y*n+x,px=left+(x+.5)*cell,py=top+(n-y-.5)*cell;
+    const dx=sample.ux[p]/scale*15,dy=-sample.uy[p]/scale*15,angle=Math.atan2(dy,dx);
+    ctx.beginPath();ctx.moveTo(px-dx/2,py-dy/2);ctx.lineTo(px+dx/2,py+dy/2);
+    ctx.lineTo(px+dx/2-4*Math.cos(angle-.5),py+dy/2-4*Math.sin(angle-.5));ctx.moveTo(px+dx/2,py+dy/2);ctx.lineTo(px+dx/2-4*Math.cos(angle+.5),py+dy/2-4*Math.sin(angle+.5));ctx.stroke();
+  }
+  ctx.fillStyle="#536a72";ctx.font="12px system-ui";ctx.fillText("x / N",left+side/2-10,top+side+25);ctx.fillText("y / N",left-46,top+side/2);ctx.fillText("0",left-12,top+side+3);ctx.fillText("1",left-12,top+7);
+  ctx.fillText(language==="en"?"Color: speed / initial amplitude (0 → 1); arrows rescaled each frame":"颜色：速度/初始振幅（0→1）；箭头逐帧缩放",80,410);
 }
 function render(sample){
   const c=activeConfig,t=text();
@@ -65,20 +115,23 @@ function render(sample){
   const y=sample.profile.map((_,i)=>(i+.5)/c.ny);
   chart($("profile"),[...sample.profile,...sample.reference],[0,1],"uₓ · lattice units","y / H",[
     {points:sample.reference.map((v,i)=>[v,y[i]])},{dots:true,points:sample.profile.map((v,i)=>[v,y[i]])}]);
-  $("wave-section").hidden=c.case!=="shear-wave";
+  const vortex=c.case==="taylor-green",unsteady=vortex||c.case==="shear-wave";
+  $("field-section").hidden=!vortex;if(vortex)drawField(sample);
+  $("wave-section").hidden=!unsteady;
   $("explanation").textContent=c.case==="shear-wave"?t.wave:t.steady;
-  if(result && c.case!=="shear-wave" && !result.converged) $("explanation").textContent=t.unfinished;
-  if(result && c.case!=="shear-wave" && result.converged) $("explanation").textContent=t.settled;
-  if(c.case==="shear-wave" && result){
-    const points=result.history, times=points.map(p=>p.step), amps=points.map(p=>Math.log10(Math.max(p.amplitude,1e-300)));
-    const exact=times.map(time=>Math.log10(c.speed)-sample.nu*(2*Math.PI/c.ny)**2*time/Math.LN10);
-    chart($("decay"),times,[...amps,...exact],"Time step","log₁₀ amplitude",[
+  if(result && !unsteady && !result.converged) $("explanation").textContent=t.unfinished;
+  if(result && !unsteady && result.converged) $("explanation").textContent=t.settled;
+  if(vortex)$("explanation").textContent=t.vortex;
+  if(unsteady && result){
+    const points=result.history, times=points.map(p=>p.step), amps=points.map(p=>Math.log10(Math.max(vortex?p.energy:p.amplitude,1e-300)));
+    const exact=vortex?points.map(p=>Math.log10(p.referenceEnergy)):times.map(time=>Math.log10(c.speed)-sample.nu*(2*Math.PI/c.ny)**2*time/Math.LN10);
+    chart($("decay"),times,[...amps,...exact],"Time step",vortex?"log₁₀ kinetic energy":"log₁₀ amplitude",[
       {points:times.map((v,i)=>[v,exact[i]])},{dots:true,points:times.map((v,i)=>[v,amps[i]])}],260);
     $("explanation").textContent+=` ${t.viscosity}: ${result.fittedNu.toFixed(6)} (input ${sample.nu.toFixed(6)}).`;
   }
   $("checks").replaceChildren();
   if(result){
-    const names={profile:t.profile,mass:t.mass,lowMach:t.lowMach,steady:t.steadyCheck,viscosity:t.viscosityCheck};
+    const names={profile:vortex?t.velocityField:t.profile,mass:t.mass,lowMach:t.lowMach,steady:t.steadyCheck,viscosity:t.viscosityCheck,energy:t.energy};
     for(const [key,passed] of Object.entries(result.criteria)){
       const item=document.createElement("span");item.className="check"+(passed?"":" fail");
       item.textContent=(passed?"✓ ":"× ")+names[key];$("checks").append(item);

@@ -1,0 +1,21 @@
+{
+  "case": "taylor-green",
+  "n": 32,
+  "steps": 200,
+  "nu_input": 0.10000000000000002,
+  "nu_fitted": 0.10010909924594183,
+  "nu_relative_error": 0.0010909924594180165,
+  "velocity_relative_l2_error": 0.005763912335984133,
+  "kinetic_energy_relative_error": 0.011491501572401086,
+  "max_sampled_relative_mass_drift": 1.3766765505351941e-14,
+  "fit_start_step": 20,
+  "fit_end_step": 200,
+  "criteria": {
+    "velocity": true,
+    "energy": true,
+    "viscosity": true,
+    "mass": true,
+    "low_mach": true
+  },
+  "passed": true
+}

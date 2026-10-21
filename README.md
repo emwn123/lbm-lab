@@ -1,22 +1,25 @@
 # LBM Flow Lab
 
-Three small flow problems for learning and checking the lattice Boltzmann method. A shared D2Q9-BGK solver handles collision, streaming, body forcing and straight walls. Each case compares the computed flow with an analytical solution.
+Four small flow problems for learning and checking the lattice Boltzmann method. A shared D2Q9-BGK solver handles collision, streaming, body forcing and straight walls. Each case compares the computed flow with an analytical solution.
 
 [中文说明](README.zh-CN.md) · [Numerical method](docs/method.md) · [Results](examples/RESULTS.md)
 
 [Interactive browser experiments](demo/index.html) · [Poiseuille refinement study](examples/CHANNEL_STUDY.md)
+
+[Guided experiment cards](docs/EXPERIMENTS.md) · [Taylor-Green vortex](examples/TAYLOR_GREEN.md)
 
 | Case | Flow | What it checks |
 |---|---|---|
 | Poiseuille | Force-driven flow between fixed plates | Body force, wall placement, parabolic velocity profile |
 | Couette | Flow driven by a moving top plate | Moving-wall boundary and linear velocity profile |
 | Shear wave | Decay of a sinusoidal velocity in a periodic domain | Streaming, viscous decay and the relaxation-time viscosity relation |
+| Taylor-Green | Four decaying vortices on a square periodic grid | Both velocity components, two spatial directions and kinetic-energy decay |
 
 ![Three analytical comparisons](examples/overview.png)
 
 ## Install and run
 
-For a browser-only introduction, open `demo/index.html` from a downloaded checkout. It runs the three experiments locally, with adjustable parameters, live diagnostics and downloadable JSON results. The JavaScript solver is cross-checked against Python. See [browser instructions and hosting](demo/README.md). GitHub's file viewer displays HTML source; an administrator can enable GitHub Pages to serve the page.
+For a browser-only introduction, open `demo/index.html` from a downloaded checkout. It runs the four experiments locally, with adjustable parameters, live diagnostics and downloadable JSON results. The JavaScript solver is cross-checked against Python. See [browser instructions and hosting](demo/README.md). GitHub's file viewer displays HTML source; an administrator can enable GitHub Pages to serve the page.
 
 ![Interactive experiment](examples/interactive-preview.png)
 
@@ -33,6 +36,7 @@ On Windows, use `py` in place of `python` if needed. To run one case:
 lbm-lab poiseuille --output channel-run
 lbm-lab couette --output moving-wall-run
 lbm-lab shear-wave --output wave-run
+lbm-lab taylor-green --output vortex-run
 ```
 
 Each command creates a case subdirectory under the requested output folder, plus `summary.json`. Choose a new or empty output folder for each run. The command returns exit code 0 when all requested cases meet their criteria and 1 when any case fails. Numerical inputs that cannot be used return a command-line error.
@@ -45,6 +49,8 @@ Each command creates a case subdirectory under the requested output folder, plus
 - `fields.npz`: final density and velocity arrays, indexed `[y, x]`, and the reference profile.
 - `config.json`: parameters and software versions.
 - `report.json`: error measures, convergence status and individual acceptance checks.
+
+Taylor-Green writes full 2D reference velocity arrays rather than `profile.csv`. Its comparison figure shows the computed field, vector-error magnitude and energy decay. See the [vortex report](examples/TAYLOR_GREEN.md).
 
 The wall cases start from rest and stop when the maximum velocity change over a 100-step checkpoint interval, divided by the configured speed, falls below 1e-8. Reaching `--max-steps` without meeting this condition is reported as a failure. The shear wave runs for a specified duration and is compared at that exact time.
 
@@ -63,8 +69,9 @@ lbm-lab shear-wave --ny 64 --speed 0.01 --wave-steps 1600 --output fine-wave
 | `--speed` | 0.02 | Continuum channel peak, top-wall speed, or initial wave amplitude |
 | `--max-steps` | 20000 | Maximum steps for a wall case |
 | `--wave-steps` | 400 | Steps for the shear wave; use at least 40 for the viscosity fit |
+| `--vortex-steps` | 200 | Steps for Taylor-Green on a square grid with side `--ny` |
 
-All quantities are in lattice units, with dx = dt = 1 and reference density 1. The viscosity is `nu=(tau-0.5)/3`. The default narrow x-domain is enough for these fully developed, x-independent flows; these cases do not exercise general 2D flow around obstacles. A larger grid may need a larger step limit. Numerical stability is not guaranteed for arbitrary positive parameters.
+All quantities are in lattice units, with dx = dt = 1 and reference density 1. The viscosity is `nu=(tau-0.5)/3`. The first three cases use a narrow x-domain for fully developed, x-independent flow. Taylor-Green instead uses a square grid with side --ny and ignores --nx; it exercises both spatial directions but not flow around obstacles. A larger grid may need a larger step limit. Numerical stability is not guaranteed for arbitrary positive parameters.
 
 ## Grid refinement
 

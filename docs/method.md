@@ -66,7 +66,11 @@ These tolerances are teaching/regression checks, not universal accuracy guarante
 
 The wave study keeps tau=0.8, nx=8 and `U*N/nu=6.4`. As N doubles, U halves and the step count quadruples. The dimensionless time `nu*t/N²=0.0390625` is fixed. This is diffusive scaling: temporal and spatial resolution change together. The observed order therefore describes this refinement path, not an independent temporal convergence test. x refinement is unnecessary for the imposed x-independent solution; it does not validate general x-dependent flows.
 
-## References
+## Two-dimensional vortex extension
+
+Taylor-Green uses the same collision and streaming implementation on a square periodic grid. Its nonuniform initial density follows the continuum pressure through p=rho/3. The reference velocity decays at rate 2 nu k², unlike the one-directional shear wave's rate nu k². Error uses both velocity components over the whole grid. The analytical energy uses unit density; numerical energy is density weighted. Formulas, measured error and the initialization limitation are documented in [the vortex report](../examples/TAYLOR_GREEN.md).
+
+## Further reading
 
 - Guo, Zheng and Shi (2002), *Discrete lattice effects on the forcing term in the lattice Boltzmann method*, Phys. Rev. E 65, 046308. [DOI](https://doi.org/10.1103/PhysRevE.65.046308).
 - Zou and He (1997), *On pressure and velocity boundary conditions for the lattice Boltzmann BGK model*, Physics of Fluids 9, 1591–1598. [Preprint](https://arxiv.org/abs/comp-gas/9611001). Background on halfway bounce-back; this code uses periodic x and has no pressure inlet/outlet implementation.

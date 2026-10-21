@@ -37,14 +37,17 @@ class D2Q9:
         self.walls, self.top_speed, self.force_x = walls, top_speed, force_x
         self.initialize()
 
-    def initialize(self, ux=0.0, uy=0.0):
-        """Initialize unit density with the requested macroscopic velocity."""
+    def initialize(self, ux=0.0, uy=0.0, rho=1.0):
+        """Initialize density and the requested macroscopic velocity."""
         shape = (self.ny, self.nx)
         ux = np.broadcast_to(np.asarray(ux, dtype=float), shape)
         uy = np.broadcast_to(np.asarray(uy, dtype=float), shape)
+        rho = np.broadcast_to(np.asarray(rho, dtype=float), shape)
         if not np.isfinite(ux).all() or not np.isfinite(uy).all():
             raise ValueError("initial velocity must be finite")
-        self.f = equilibrium(np.ones(shape), ux - self.force_x/2, uy)
+        if not np.isfinite(rho).all() or (rho <= 0).any():
+            raise ValueError("initial density must be finite and positive")
+        self.f = equilibrium(rho, ux - self.force_x/(2*rho), uy)
 
     def macroscopic(self):
         rho = self.f.sum(axis=0)

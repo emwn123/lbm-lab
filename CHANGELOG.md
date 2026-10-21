@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Add a square-domain Taylor-Green vortex with full-field velocity and kinetic-energy checks.
+- Add pressure-consistent initial density and verify JavaScript/Python agreement for both velocity components.
+- Add a browser velocity map and four guided experiment cards in English and Chinese.
+- Include Taylor-Green in `lbm-lab all` and add `--vortex-steps` for its duration.
+
 ## 0.2.0
 
 - Add browser experiments with local computation, parameter controls, cancellation and JSON export.

@@ -1,4 +1,4 @@
-"""Run Poiseuille, Couette and shear-wave benchmarks against analytical solutions."""
+"""Run channel, shear-wave and Taylor-Green benchmarks against analytical solutions."""
 
 import argparse
 import csv
@@ -150,7 +150,7 @@ def _plot(output, name, y, measured, reference, rows, nu, k, speed):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("case", choices=["all", "poiseuille", "couette", "shear-wave"])
+    parser.add_argument("case", choices=["all", "poiseuille", "couette", "shear-wave", "taylor-green"])
     parser.add_argument("--output", type=Path, default=Path("runs"))
     parser.add_argument("--ny", type=int, default=32)
     parser.add_argument("--nx", type=int, default=8)
@@ -158,13 +158,22 @@ def main(argv=None):
     parser.add_argument("--speed", type=float, default=0.02)
     parser.add_argument("--max-steps", type=int, default=20000)
     parser.add_argument("--wave-steps", type=int, default=400)
+    parser.add_argument("--vortex-steps", type=int, default=200)
     args = vars(parser.parse_args(argv))
     case, output = args.pop("case"), args.pop("output")
+    vortex_steps = args.pop("vortex_steps")
     try:
         if output.exists() and any(output.iterdir()):
             raise ValueError("choose an empty output directory")
-        names = ("poiseuille", "couette", "shear-wave") if case == "all" else (case,)
-        reports = {name: run_case(name, output/name, **args) for name in names}
+        names = ("poiseuille", "couette", "shear-wave", "taylor-green") if case == "all" else (case,)
+        reports = {}
+        for name in names:
+            if name == "taylor-green":
+                from .taylor_green import run
+                reports[name] = run(output/name, n=args["ny"], tau=args["tau"],
+                                     speed=args["speed"], steps=vortex_steps)
+            else:
+                reports[name] = run_case(name, output/name, **args)
         _json(output / "summary.json", reports)
     except (ValueError, OSError, FloatingPointError) as exc:
         parser.error(str(exc))
