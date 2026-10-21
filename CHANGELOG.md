@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add a direct online entry and a bilingual first-experiment guide.
+- Add trial-feedback and bug-report forms, including feedback context.
+- Link first-run help and feedback from the browser footer.
+
 ## 0.3.0
 
 - Add a square-domain Taylor-Green vortex with full-field velocity and kinetic-energy checks.

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Online experiments / 在线实验
+    url: https://emwn123.github.io/lbm-lab/demo/
+    about: Run the experiments without installing Python / 无需安装 Python 即可运行
+  - name: First experiment / 入门说明
+    url: https://github.com/emwn123/lbm-lab/blob/main/docs/QUICKSTART.md
+    about: A short guide to your first run / 从第一个实验开始

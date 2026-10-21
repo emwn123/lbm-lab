@@ -1,5 +1,9 @@
 # LBM Flow Lab：基础流动教学与验证
 
+**[直接在线运行](https://emwn123.github.io/lbm-lab/demo/)** · [两分钟入门](docs/QUICKSTART.md#中文入门) · [留下试用反馈](https://github.com/emwn123/lbm-lab/issues/new?template=trial-feedback.yml)
+
+网页版无需安装或 API Key。可以先运行移动壁面流动，再探索涡旋和数值误差。
+
 用同一个 D2Q9-BGK 求解器运行四个基础算例，并与解析解比较。源码包含碰撞、迁移、Guo 力项，以及固定壁面和运动壁面的半格点反弹边界。
 
 | 算例 | 现象 | 验证内容 |

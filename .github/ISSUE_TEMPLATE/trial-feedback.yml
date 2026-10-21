@@ -1,0 +1,52 @@
+name: Trial feedback / 试用反馈
+description: Tell us about an experiment you actually tried / 记录实际试用情况
+title: "[Feedback] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or Chinese is welcome. Describe an actual attempt, including failures or confusing instructions. Please do not include passwords, API keys or private research data.
+        可用中文或英文填写，记录实际尝试即可。无法运行或不理解的地方同样有用。
+  - type: dropdown
+    id: source
+    attributes:
+      label: Context / 反馈来源
+      options:
+        - Independent trial / 独立试用
+        - Invited trial / 受邀试用
+        - Maintainer self-test / 维护者自测
+    validations:
+      required: true
+  - type: dropdown
+    id: entry
+    attributes:
+      label: How did you use the tool? / 使用方式
+      options:
+        - Browser experiments / 网页实验
+        - Python package / Python 代码
+        - Both / 两者都用过
+    validations:
+      required: true
+  - type: textarea
+    id: attempt
+    attributes:
+      label: What did you try? / 尝试了什么
+      description: Case and parameters, or a command if applicable / 算例、参数或命令
+    validations:
+      required: true
+  - type: textarea
+    id: observation
+    attributes:
+      label: What happened or was unclear? / 结果或不清楚的地方
+      description: Include the step that worked, failed or caused confusion / 描述实际发生的情况
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment, if relevant / 运行环境（可选）
+      description: Browser and device, or OS and Python version / 浏览器及设备，或系统和 Python 版本
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement / 改进建议（可选）

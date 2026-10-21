@@ -1,5 +1,9 @@
 # LBM Flow Lab
 
+**[Run in your browser](https://emwn123.github.io/lbm-lab/demo/)** · [Two-minute tour](docs/QUICKSTART.md) · [Share trial feedback](https://github.com/emwn123/lbm-lab/issues/new?template=trial-feedback.yml)
+
+No installation or API key is needed for the online experiments. Start with moving-wall flow, then explore vortices and numerical error.
+
 Four small flow problems for learning and checking the lattice Boltzmann method. A shared D2Q9-BGK solver handles collision, streaming, body forcing and straight walls. Each case compares the computed flow with an analytical solution.
 
 [中文说明](README.zh-CN.md) · [Numerical method](docs/method.md) · [Results](examples/RESULTS.md)

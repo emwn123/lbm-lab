@@ -1,5 +1,7 @@
 # Contributing
 
+For first-time use, start with the [short tour](docs/QUICKSTART.md). Share an actual trial through the [feedback form](https://github.com/emwn123/lbm-lab/issues/new?template=trial-feedback.yml), or use the bug-report form for reproducible failures. Invited feedback and maintainer self-tests are welcome; identify which context applies. No positive review, star or contribution is expected in return for using the tool.
+
 For a bug report, include the exact command, software versions, parameters and the relevant report. Small reproducible inputs are easiest to review.
 
 For numerical changes, provide an independent reference and explain any changes in error, conservation, wall position or convergence. Run unit tests and the default three-case suite before submitting. Preserve failed-case reports when they help explain a numerical limitation.
