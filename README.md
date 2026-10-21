@@ -12,7 +12,7 @@ Four small flow problems for learning and checking the lattice Boltzmann method.
 
 [Guided experiment cards](docs/EXPERIMENTS.md) · [Taylor-Green vortex](examples/TAYLOR_GREEN.md)
 
-An additional [Rayleigh-Taylor experiment](examples/RAYLEIGH_TAYLOR.md) couples a diffuse interface to low-Atwood buoyancy. It is a separate exploratory Python case with recorded animation and controls, rather than an analytical benchmark or browser simulation.
+An additional [Rayleigh-Taylor experiment](examples/RAYLEIGH_TAYLOR.md) couples a diffuse interface to low-Atwood buoyancy. It runs in Python and in the browser through the same Run experiment control. Recorded Python output and controls are also included. It remains exploratory, with no analytical benchmark pass claimed.
 
 | Case | Flow | What it checks |
 |---|---|---|
@@ -25,7 +25,7 @@ An additional [Rayleigh-Taylor experiment](examples/RAYLEIGH_TAYLOR.md) couples 
 
 ## Install and run
 
-For a browser-only introduction, open `demo/index.html` from a downloaded checkout. It runs the four experiments locally, with adjustable parameters, live diagnostics and downloadable JSON results. The JavaScript solver is cross-checked against Python. See [browser instructions and hosting](demo/README.md). GitHub's file viewer displays HTML source; an administrator can enable GitHub Pages to serve the page.
+For a browser-only introduction, open `demo/index.html` from a downloaded checkout. It runs four benchmarks and an exploratory Rayleigh–Taylor experiment locally, with adjustable parameters, live diagnostics and downloadable JSON results. The JavaScript solver is cross-checked against Python. See [browser instructions and hosting](demo/README.md). GitHub's file viewer displays HTML source; an administrator can enable GitHub Pages to serve the page.
 
 ![Interactive experiment](examples/interactive-preview.png)
 

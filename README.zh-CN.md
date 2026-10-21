@@ -4,7 +4,7 @@
 
 网页版无需安装或 API Key。可以先运行移动壁面流动，再探索涡旋和数值误差。
 
-新增 [瑞利–泰勒不稳定性试验](examples/RAYLEIGH_TAYLOR.md)：低 Atwood 数下的相场—LBM 耦合，附已计算动画、守恒记录及对照。它是独立的 Python 探索算例，未作为解析基准或网页实时模拟发布。
+新增 [瑞利–泰勒不稳定性试验](examples/RAYLEIGH_TAYLOR.md)：低 Atwood 数下的相场—LBM 耦合，附已计算动画、守恒记录及对照。可在网页上方选择 Rayleigh–Taylor，再点击 Run experiment 实时运行；也可使用 Python。该算例仍属探索试验，不提供解析验证通过标记。
 
 用同一个 D2Q9-BGK 求解器运行四个基础算例，并与解析解比较。源码包含碰撞、迁移、Guo 力项，以及固定壁面和运动壁面的半格点反弹边界。
 
@@ -17,7 +17,7 @@
 
 ## 安装与运行
 
-无需安装 Python 的交互入口：下载仓库后打开 `demo/index.html`。可调整网格、松弛时间与速度，运行四个算例、查看误差并下载 JSON。网页全部在本机计算；浏览器实现与 Python 求解器做交叉测试。[交互说明及 GitHub Pages 设置](demo/README.md)
+无需安装 Python 的交互入口：下载仓库后打开 `demo/index.html`。可调整网格、松弛时间与速度，运行四个解析算例及瑞利–泰勒试验、查看诊断并下载 JSON。网页全部在本机计算；浏览器实现与 Python 求解器做交叉测试。[交互说明及 GitHub Pages 设置](demo/README.md)
 
 需要 Python 3.11 或以上版本。在项目目录运行：
 

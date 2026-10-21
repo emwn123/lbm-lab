@@ -12,6 +12,7 @@ const cases={
 Object.assign(words.en,{vortex:"The error uses both velocity components over the full 2D grid. The profile is a slice at x = 0.5; energy is density-weighted.",energy:"Energy",velocityField:"2D velocity",energyTitle:"Kinetic energy decay"});
 Object.assign(words.zh,{vortex:"误差使用整个二维网格上的两个速度分量。剖面取 x=0.5 的切片；动能按密度加权。",energy:"动能",velocityField:"二维速度",energyTitle:"动能衰减"});
 cases["taylor-green"]={en:["A square periodic domain contains four decaying vortices.","Initial velocity amplitude","Both velocity components vary in x and y. Compare the full velocity field and kinetic energy with the continuum reference. Pressure-consistent density reduces acoustic startup, but this remains a weakly compressible approximation."],zh:["正方形周期域内的四个涡旋逐渐衰减。","初始速度振幅","两个速度分量均随 x 和 y 变化。比较整个速度场和动能，而不只看剖面。初始密度与解析压力相匹配，但模型仍是弱可压缩近似。"]};
+cases["rayleigh-taylor"]={en:["A perturbed heavy-over-light interface evolves under buoyancy and surface tension.","","Low-Atwood Cahn–Hilliard / Boussinesq D2Q9 experiment. The phase mean and fluid mass should be conserved. Longer runs may meet walls or exceed stability guards. No analytical error or benchmark pass is reported."],zh:["重相位于轻相之上，受扰动的界面在浮力与表面张力作用下演化。","","低 Atwood 数 Cahn–Hilliard / Boussinesq D2Q9 试验。检查相场平均值和流体质量守恒。长时间运行可能触壁或触发稳定性保护。不提供解析误差或验证通过标记。"]};
 const activities=[
   {case:"couette",en:["01 · Move the wall","Run at speed 0.02, then 0.04. What changes in the steady profile?","The slope and velocity double; the profile stays linear."],zh:["01 · 移动壁面","分别使用速度 0.02 与 0.04。稳态速度剖面如何变化？","斜率与速度加倍，剖面仍为直线。"]},
   {case:"poiseuille",en:["02 · Resolve the walls","Compare N=16 and N=32. Check the error, not just the curve overlap.","For this straight channel, profile error is expected to decrease approximately as N⁻². Use the Python study to match Reynolds number."],zh:["02 · 加密壁面附近的网格","比较 N=16 与 N=32。除了曲线重合，还要查看误差。","该直通道的剖面误差预期约按 N⁻² 下降。严格匹配 Reynolds 数的对比可运行 Python 研究。"]},
@@ -39,21 +40,26 @@ function translate(){
   $("language").textContent=language==="en"?"中文":"English";
   const info=cases[$("case").value][language];
   $("description").textContent=info[0]; $("speed-label").textContent=info[1]; $("lesson").textContent=info[2];
+  const rt=$("case").value==="rayleigh-taylor";
+  if(rt&&!document.querySelector('#ny option[value="64"]')){const opt=document.createElement("option");opt.value="64";opt.textContent="64";$("ny").append(opt);$("ny").value="64";}
+  if(!rt&&document.querySelector('#ny option[value="64"]')){document.querySelector('#ny option[value="64"]').remove();$("ny").value="32";}
+  $("flow-controls").hidden=rt;$("rt-controls").hidden=!rt;
+  $("error-label").textContent=rt?(language==="en"?"Phase mean drift":"相场平均值漂移"):(language==="en"?"Velocity error":"速度误差");
   const vortex=$("case").value==="taylor-green";
-  $("geometry").textContent=vortex?(language==="en"?"Square N × N grid · periodic x and y · lattice units":"N×N 正方形网格 · x、y 周期边界 · 格子单位"):(language==="en"?"8 nodes along x · lattice units":"x 方向 8 个节点 · 格子单位");
+  $("geometry").textContent=rt?`${$("ny").value} × ${2*Number($("ny").value)} · ${language==="en"?"periodic x, no-slip y · lattice units":"x 周期，y 无滑移 · 格子单位"}`:vortex?(language==="en"?"Square N × N grid · periodic x and y · lattice units":"N×N 正方形网格 · x、y 周期边界 · 格子单位"):(language==="en"?"8 nodes along x · lattice units":"x 方向 8 个节点 · 格子单位");
   $("profile-title").textContent=vortex?(language==="en"?"Velocity slice at x = 0.5":"x=0.5 的速度切片"):(language==="en"?"Velocity profile":"速度剖面");
   $("decay-title").textContent=vortex?text().energyTitle:(language==="en"?"Amplitude decay":"振幅衰减");
   renderActivities();
   if(lastSample) render(lastSample); else {$("status").textContent=text().ready; drawEmpty();}
 }
-function config(){return {case:$("case").value,ny:Number($("ny").value),tau:Number($("tau").value),speed:Number($("speed").value)};}
+function config(){if($("case").value==="rayleigh-taylor")return {case:"rayleigh-taylor",nx:Number($("ny").value),tau:.65,steps:Number($("rt-steps").value),gravity:Number($("rt-gravity").value)};return {case:$("case").value,ny:Number($("ny").value),tau:Number($("tau").value),speed:Number($("speed").value)};}
 function updateValues(){
   $("tau-value").textContent=Number($("tau").value).toFixed(2);
   $("nu-value").textContent=((Number($("tau").value)-.5)/3).toFixed(4);
   $("speed-value").textContent=Number($("speed").value).toFixed(3);
 }
 function setBusy(busy){
-  ["case","ny","tau","speed","run"].forEach(id=>$(id).disabled=busy);
+  ["case","ny","tau","speed","rt-steps","rt-gravity","run"].forEach(id=>$(id).disabled=busy);
   $("stop").disabled=!busy; $("download").disabled=busy || !result;
   document.querySelectorAll("[data-preset]").forEach(el=>el.disabled=busy);
 }
@@ -80,6 +86,7 @@ function chart(svg, xValues, yValues, xLabel, yLabel, series, height=330){
   svg.innerHTML=markup;
 }
 function drawEmpty(){
+  $("rt-section").hidden=true;$("profile").removeAttribute("hidden");$("profile-heading").hidden=false;
   chart($("profile"),[-.01,.02],[0,1],"uₓ · lattice units","y / H",[]);
   $("explanation").textContent=language==="en"?"Choose a case and run the experiment.":"选择算例后点击运行。";
   $("wave-section").hidden=true;
@@ -105,7 +112,27 @@ function drawField(sample){
   ctx.fillStyle="#536a72";ctx.font="12px system-ui";ctx.fillText("x / N",left+side/2-10,top+side+25);ctx.fillText("y / N",left-46,top+side/2);ctx.fillText("0",left-12,top+side+3);ctx.fillText("1",left-12,top+7);
   ctx.fillText(language==="en"?"Color: speed / initial amplitude (0 → 1); arrows rescaled each frame":"颜色：速度/初始振幅（0→1）；箭头逐帧缩放",80,410);
 }
+function renderRT(sample){
+  const en=language==="en";
+  $("step").textContent=`t = ${sample.step.toLocaleString()}`;
+  $("error").textContent=sample.maxPhaseDrift.toExponential(1);
+  $("mass").textContent=sample.maxMassDrift.toExponential(1);$("mach").textContent=sample.maxMach.toFixed(4);
+  $("status").textContent=phase==="running"?text().running:phase==="stopped"?text().stopped:(en?"Run completed · exploratory":"运行完成 · 探索试验");
+  $("rt-section").hidden=false;$("profile").setAttribute("hidden","");$("profile-heading").hidden=true;$("field-section").hidden=true;$("wave-section").hidden=true;$("checks").replaceChildren();
+  const ctx=$("rt-field").getContext("2d"),cell=Math.min(620/sample.nx,430/sample.ny),left=(700-sample.nx*cell)/2;
+  ctx.clearRect(0,0,700,500);
+  for(let y=0;y<sample.ny;y++)for(let x=0;x<sample.nx;x++){
+    const v=Math.max(-1,Math.min(1,sample.phi[y*sample.nx+x])),a=Math.abs(v);
+    ctx.fillStyle=v>=0?`rgb(${Math.round(245-65*a)},${Math.round(245-205*a)},${Math.round(245-190*a)})`:`rgb(${Math.round(245-210*a)},${Math.round(245-150*a)},${Math.round(245-75*a)})`;
+    const x0=Math.round(left+x*cell),y0=Math.round(15+(sample.ny-1-y)*cell);
+    ctx.fillRect(x0,y0,Math.round(left+(x+1)*cell)-x0,Math.round(15+(sample.ny-y)*cell)-y0);
+  }
+  ctx.fillStyle="#536a72";ctx.font="13px system-ui";ctx.fillText(`x: 0–${sample.nx} · y: 0–${sample.ny}`,left,470);
+  $("explanation").textContent=en?"Computed live on this device. Phase mean drift measures conservation, not solution accuracy. Low-Atwood approximation; quantitative growth-rate and grid-convergence validation remain open.":"在本机实时计算。相场平均值漂移衡量守恒，不代表解的精度。采用低 Atwood 数近似；定量增长率和网格收敛验证仍待完成。";
+}
 function render(sample){
+  if(activeConfig.case==="rayleigh-taylor"){renderRT(sample);return;}
+  $("rt-section").hidden=true;$("profile").removeAttribute("hidden");$("profile-heading").hidden=false;
   const c=activeConfig,t=text();
   $("step").textContent=`t = ${sample.step.toLocaleString()}`;
   $("error").textContent=(100*sample.error).toFixed(3)+"%";
@@ -140,7 +167,8 @@ function render(sample){
 }
 $("run").addEventListener("click",()=>{
   result=null;lastSample=null;activeConfig=config();phase="running";setBusy(true);$("checks").replaceChildren();
-  const code=`const runBenchmark=${LBMDemo.runBenchmark.toString()};self.onmessage=({data})=>{try{const result=runBenchmark(data,sample=>self.postMessage({type:'progress',sample}));self.postMessage({type:'done',result});}catch(error){self.postMessage({type:'error',message:error.message});}};`;
+  const runner=activeConfig.case==="rayleigh-taylor"?RTDemo.runRayleighTaylor:LBMDemo.runBenchmark;
+  const code=`const runBenchmark=${runner.toString()};self.onmessage=({data})=>{try{const result=runBenchmark(data,sample=>self.postMessage({type:'progress',sample}));self.postMessage({type:'done',result});}catch(error){self.postMessage({type:'error',message:error.message});}};`;
   const url=URL.createObjectURL(new Blob([code],{type:"application/javascript"}));
   worker=new Worker(url);URL.revokeObjectURL(url);
   worker.onmessage=({data})=>{
@@ -154,7 +182,7 @@ $("run").addEventListener("click",()=>{
 function fail(message){if(worker)worker.terminate();worker=null;phase="stopped";setBusy(false);$("status").textContent=text().errors+": "+message;}
 $("stop").addEventListener("click",()=>{if(worker)worker.terminate();worker=null;phase="stopped";setBusy(false);if(lastSample)render(lastSample);else $("status").textContent=text().stopped;});
 $("language").addEventListener("click",()=>{language=language==="en"?"zh":"en";translate();});
-for(const id of ["case","ny","tau","speed"]) $(id).addEventListener("input",()=>{
+for(const id of ["case","ny","tau","speed","rt-steps","rt-gravity"]) $(id).addEventListener("input",()=>{
   updateValues(); result=null;lastSample=null;phase="ready";setBusy(false);
   $("error").textContent=$("mass").textContent=$("mach").textContent="—";$("step").textContent="t = 0";$("checks").replaceChildren();translate();
 });

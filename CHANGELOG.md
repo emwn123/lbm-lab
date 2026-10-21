@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1
+
+- Integrate a live Rayleigh–Taylor solver into the shared browser selector and Run experiment control.
+- Add step-count and gravity controls, a live phase map, cancellation and completed-run JSON.
+- Cross-check the JavaScript phase field against Python and document a 20000-step local run and wall-interaction limits.
+
+
 ## 0.4.0
 
 - Add an exploratory low-Atwood Rayleigh-Taylor case coupling Cahn-Hilliard transport and Boussinesq LBM flow.

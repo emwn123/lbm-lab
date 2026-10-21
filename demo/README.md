@@ -32,3 +32,9 @@ The cross-language Python tests require Node.js. They are skipped locally if Nod
 ## Taylor-Green and guided activities
 
 Taylor-Green duration is `round(200*N²/32²)`. Its initial density follows the analytical pressure. Acceptance uses the full 2D velocity error (<1%), kinetic-energy error (<2%), fitted viscosity (<1%), mass and Mach checks. The displayed profile is only the x=0.5 slice. Colors use a fixed initial-amplitude scale; arrows rescale per frame. JSON includes final 2D fields flattened in row-major [y,x] order. Four activity cards load starting configurations and offer prediction prompts with expandable expected behavior. See [the experiment guide](../docs/EXPERIMENTS.md).
+
+## Live Rayleigh–Taylor
+
+Choose Rayleigh–Taylor in the same selector, then Run experiment. It computes a conservative Cahn–Hilliard phase field coupled to Boussinesq D2Q9 flow, entirely in the browser worker. The default is 64 × 128, tau=0.65, A=0.05 and 10000 steps. The RT controls replace benchmark speed/tau controls with step count and gravity. Results show phase-mean drift, fluid mass drift, maximum Mach and the live phase field, without analytical error or a benchmark pass badge.
+
+The 5000-step Python animation farther down the page remains a reference, separate from the live calculation. Stop and completed-run JSON download work through the shared controls. See [model and limits](../examples/RAYLEIGH_TAYLOR.md), including the consequences of walls and changing the wavelength.

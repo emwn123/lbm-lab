@@ -4,38 +4,42 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LBM Flow Lab — Interactive benchmarks</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="solver.js"></script><script defer src="app.js"></script>
+  <script defer src="solver.js"></script><script defer src="rt-solver.js"></script><script defer src="app.js"></script>
 </head>
 <body>
   <header><a class="brand" href="https://github.com/emwn123/lbm-lab">LBM <strong>Flow Lab</strong></a><span>LEARN · RUN · COMPARE</span><button id="language" class="quiet">中文</button></header>
   <main>
     <section class="intro"><p class="eyebrow" data-en="A SMALL LAB FOR FLUID FLOW" data-zh="基础流动实验室">A SMALL LAB FOR FLUID FLOW</p>
       <h1 data-en="See the flow. Check the numbers." data-zh="看流动，也看误差。">See the flow. Check the numbers.</h1>
-      <p data-en="Run four lattice Boltzmann experiments in your browser and compare them with analytical solutions." data-zh="在浏览器中运行四个 LBM 实验，并与解析解比较。">Run four lattice Boltzmann experiments in your browser and compare them with analytical solutions.</p>
+      <p data-en="Run four analytical benchmarks and a Rayleigh–Taylor interface experiment in your browser." data-zh="在浏览器中运行四个解析验证算例和瑞利–泰勒界面试验。">Run four analytical benchmarks and a Rayleigh–Taylor interface experiment in your browser.</p>
     </section>
     <div class="workspace">
       <aside>
         <h2 data-en="Set up an experiment" data-zh="设置实验">Set up an experiment</h2>
         <label for="case" data-en="Flow case" data-zh="算例">Flow case</label>
-        <select id="case"><option value="poiseuille">Poiseuille · Channel flow</option><option value="couette">Couette · Moving wall</option><option value="shear-wave">Shear wave · Viscous decay</option><option value="taylor-green">Taylor–Green · 2D vortices</option></select>
+        <select id="case"><option value="poiseuille">Poiseuille · Channel flow</option><option value="couette">Couette · Moving wall</option><option value="shear-wave">Shear wave · Viscous decay</option><option value="taylor-green">Taylor–Green · 2D vortices</option><option value="rayleigh-taylor">Rayleigh–Taylor · Interface growth</option></select>
         <p id="description" class="hint"></p>
         <label for="ny" data-en="Nodes across the flow" data-zh="横向节点数">Nodes across the flow</label>
         <select id="ny"><option>16</option><option>24</option><option selected>32</option><option>48</option></select>
-        <label for="tau"><span data-en="Relaxation time" data-zh="松弛时间">Relaxation time</span> <output id="tau-value">0.80</output></label>
+        <div id="flow-controls"><label for="tau"><span data-en="Relaxation time" data-zh="松弛时间">Relaxation time</span> <output id="tau-value">0.80</output></label>
         <input id="tau" type="range" min="0.6" max="1.2" step="0.05" value="0.8">
         <p class="hint">ν = (τ − 0.5) / 3 = <span id="nu-value">0.1000</span></p>
         <label for="speed"><span id="speed-label">Reference peak speed</span> <output id="speed-value">0.020</output></label>
         <input id="speed" type="range" min="0.005" max="0.04" step="0.005" value="0.02">
-        <p id="geometry" class="hint">Lattice units · periodic flow direction · 8 nodes along x</p>
+        </div><div id="rt-controls" hidden>
+<label for="rt-steps" data-en="Time steps" data-zh="计算步数">Time steps</label><select id="rt-steps"><option>5000</option><option selected>10000</option><option>20000</option><option>30000</option></select>
+<label for="rt-gravity" data-en="Gravity (lattice units)" data-zh="重力（格子单位）">Gravity (lattice units)</label><select id="rt-gravity"><option value="0">0 · control</option><option value="0.0002">0.0002</option><option selected value="0.0004">0.0004</option></select>
+<p class="hint" data-en="Fixed: A=0.05, τ=0.65, initial amplitude=2. Stop is available during a run. Larger grids cost more time; changing the grid here also changes the physical setup." data-zh="固定 A=0.05、τ=0.65、初始振幅=2。运行时可停止。大网格耗时更长；此处改变网格也会改变物理问题，不能作为网格收敛研究。">Fixed: A=0.05, τ=0.65, initial amplitude=2. Stop is available during a run. Larger grids cost more time; changing the grid here also changes the physical setup.</p></div><p id="geometry" class="hint">Lattice units · periodic flow direction · 8 nodes along x</p>
         <button id="run" class="primary" data-en="Run experiment" data-zh="运行实验">Run experiment</button>
         <button id="stop" class="quiet" disabled data-en="Stop" data-zh="停止">Stop</button>
         <button id="download" class="quiet" disabled data-en="Download results (JSON)" data-zh="下载结果（JSON）">Download results (JSON)</button>
       </aside>
       <section class="results" aria-label="Simulation results">
         <div class="statusline"><span id="status" role="status" aria-live="polite">Ready to run</span><span id="step">t = 0</span></div>
-        <div class="metrics"><div><span data-en="Velocity error" data-zh="速度误差">Velocity error</span><strong id="error">—</strong></div><div><span data-en="Mass drift" data-zh="质量漂移">Mass drift</span><strong id="mass">—</strong></div><div><span data-en="Max. Mach" data-zh="最大 Mach 数">Max. Mach</span><strong id="mach">—</strong></div></div>
+        <div class="metrics"><div><span id="error-label" data-en="Velocity error" data-zh="速度误差">Velocity error</span><strong id="error">—</strong></div><div><span data-en="Mass drift" data-zh="质量漂移">Mass drift</span><strong id="mass">—</strong></div><div><span data-en="Max. Mach" data-zh="最大 Mach 数">Max. Mach</span><strong id="mach">—</strong></div></div>
+        <section id="rt-section" hidden><h2 data-en="Phase field · red: heavy, blue: light" data-zh="相场 · 红：重相，蓝：轻相">Phase field · red: heavy, blue: light</h2><canvas id="rt-field" width="700" height="500" role="img" aria-label="Live Rayleigh-Taylor phase field"></canvas></section>
         <section id="field-section" hidden><h2 data-en="Two-dimensional velocity" data-zh="二维速度场">Two-dimensional velocity</h2><canvas id="field" width="700" height="420" role="img" aria-label="Computed speed map and velocity arrows"></canvas></section>
-        <div class="chart-title"><h2 id="profile-title">Velocity profile</h2><div class="legend"><span class="line">Analytical</span><span class="dot">LBM</span></div></div>
+        <div id="profile-heading" class="chart-title"><h2 id="profile-title">Velocity profile</h2><div class="legend"><span class="line">Analytical</span><span class="dot">LBM</span></div></div>
         <svg id="profile" viewBox="0 0 700 330" role="img" aria-label="Velocity profile comparison"></svg>
         <div id="wave-section" hidden><h2 id="decay-title">Amplitude decay</h2><svg id="decay" viewBox="0 0 700 260" role="img" aria-label="Decay comparison"></svg></div>
         <p id="explanation" class="explanation"></p>
@@ -43,7 +47,7 @@
       </section>
     </div>
     <section class="activities"><h2 data-en="Try a guided experiment" data-zh="动手试一试">Try a guided experiment</h2><div id="activity-cards"></div></section>
-    <section class="recorded"><h2 data-en="Rayleigh–Taylor · recorded Python experiment" data-zh="瑞利–泰勒 · 已计算的 Python 试验">Rayleigh–Taylor · recorded Python experiment</h2><div class="recorded-layout"><img src="../examples/rayleigh-taylor/evolution.gif" width="256" height="552" alt="Recorded growth of a perturbed heavy-over-light interface" loading="lazy"><div><p data-en="A low-Atwood diffuse-interface experiment: heavy material sinks and light material rises. This animation is from a saved 64 × 128 Python run, not a browser simulation." data-zh="低 Atwood 数相场试验：重相下降，轻相上升。动画来自已保存的 64×128 Python 运行，不是浏览器实时模拟。">A low-Atwood diffuse-interface experiment: heavy material sinks and light material rises. This animation is from a saved 64 × 128 Python run, not a browser simulation.</p><p data-en="Conservation and basic controls were checked. Grid convergence and quantitative growth-rate validation remain open." data-zh="已检查基本守恒和对照，网格收敛与定量增长率验证仍待完成。">Conservation and basic controls were checked. Grid convergence and quantitative growth-rate validation remain open.</p><pre>python -m lbm_lab.rayleigh_taylor --output rt-run</pre><a href="https://github.com/emwn123/lbm-lab/blob/main/examples/RAYLEIGH_TAYLOR.md" data-en="Read the model, controls and results" data-zh="查看模型、对照与结果">Read the model, controls and results</a></div></div></section>
+    <section class="recorded"><h2 data-en="Rayleigh–Taylor · Python reference run" data-zh="瑞利–泰勒 · Python 参考运行">Rayleigh–Taylor · Python reference run</h2><div class="recorded-layout"><img src="../examples/rayleigh-taylor/evolution.gif" width="256" height="552" alt="Recorded growth of a perturbed heavy-over-light interface" loading="lazy"><div><p data-en="A low-Atwood diffuse-interface experiment: heavy material sinks and light material rises. This saved 64 × 128 Python run is a reference. Select Rayleigh–Taylor above to compute a new run in your browser." data-zh="低 Atwood 数相场试验：重相下降，轻相上升。此动画为已保存的 64×128 Python 参考运行。可在上方选择瑞利–泰勒，在浏览器中重新计算。">A low-Atwood diffuse-interface experiment: heavy material sinks and light material rises. This saved 64 × 128 Python run is a reference. Select Rayleigh–Taylor above to compute a new run in your browser.</p><p data-en="Conservation and basic controls were checked. Grid convergence and quantitative growth-rate validation remain open." data-zh="已检查基本守恒和对照，网格收敛与定量增长率验证仍待完成。">Conservation and basic controls were checked. Grid convergence and quantitative growth-rate validation remain open.</p><pre>python -m lbm_lab.rayleigh_taylor --output rt-run</pre><a href="https://github.com/emwn123/lbm-lab/blob/main/examples/RAYLEIGH_TAYLOR.md" data-en="Read the model, controls and results" data-zh="查看模型、对照与结果">Read the model, controls and results</a></div></div></section>
     <section class="notes"><h2 data-en="What this experiment checks" data-zh="这个实验检查什么">What this experiment checks</h2><p id="lesson"></p><p data-en="Runs use D2Q9-BGK collision, Guo forcing and halfway bounce-back walls where applicable. The browser implementation is tested against the Python solver. A passing case is a check for these conditions, not a guarantee for other flows." data-zh="采用 D2Q9-BGK 碰撞、Guo 力项及适用的半格点反弹壁面。浏览器实现与 Python 求解器做交叉检查。通过仅适用于对应测试条件，不代表其他流动同样准确。">Runs use D2Q9-BGK collision, Guo forcing and halfway bounce-back walls where applicable. The browser implementation is tested against the Python solver. A passing case is a check for these conditions, not a guarantee for other flows.</p><p data-en="Everything runs on your device. No account, API key or data upload is needed." data-zh="计算全部在本机进行，无需账号、API Key 或上传数据。">Everything runs on your device. No account, API key or data upload is needed.</p></section>
   </main>
   <footer>LBM Flow Lab <span><a href="https://github.com/emwn123/lbm-lab/blob/main/docs/QUICKSTART.md" data-en="First experiment" data-zh="入门说明">First experiment</a> · <a href="https://github.com/emwn123/lbm-lab/issues/new?template=trial-feedback.yml" data-en="Trial feedback" data-zh="试用反馈">Trial feedback</a> · MIT License · <a href="https://github.com/emwn123/lbm-lab/blob/main/docs/method.md">Numerical method</a></span></footer>

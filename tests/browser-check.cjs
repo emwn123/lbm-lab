@@ -16,3 +16,14 @@ assert.equal(short.converged,false);
 assert.equal(short.passed,false);
 assert.throws(()=>runBenchmark({case:"poiseuille",ny:0}), /Unsupported/);
 console.log("Browser solver: four benchmarks, coarse-grid failure, incomplete run and invalid input passed.");
+
+const {runRayleighTaylor:rt}=require("../demo/rt-solver.js");
+const rtRun=rt({nx:32,steps:100});
+assert.equal(rtRun.step,100);
+assert.equal(rtRun.phi.length,32*64);
+assert.ok(rtRun.maxPhaseDrift<1e-12);
+assert.ok(rtRun.maxMassDrift<1e-10);
+assert.ok(!("passed" in rtRun));
+assert.throws(()=>rt({steps:30001}),/Unsupported/);
+assert.throws(()=>rt({gravity:-1}),/Unsupported/);
+console.log("RT conservation, field dimensions, exploratory status and parameter bounds passed.");

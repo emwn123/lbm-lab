@@ -3,11 +3,13 @@
 import json
 import shutil
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
 
+from lbm_lab.rayleigh_taylor import simulate
 from lbm_lab.solver import D2Q9
 from lbm_lab.taylor_green import reference
 
@@ -16,6 +18,23 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(shutil.which("node"), "Node.js is needed for browser/Python parity tests")
 class BrowserParityTests(unittest.TestCase):
+    def test_rayleigh_taylor_phase_and_diagnostics(self):
+        config = {"nx": 32, "steps": 100, "gravity": 0.0004}
+        script = ("const {runRayleighTaylor:r}=require('./demo/rt-solver.js');"
+                  "console.log(JSON.stringify(r(JSON.parse(process.argv[1]))));")
+        completed = subprocess.run(["node", "-e", script, json.dumps(config)], cwd=ROOT,
+                                   capture_output=True, text=True, check=True)
+        browser = json.loads(completed.stdout)
+        with tempfile.TemporaryDirectory() as folder:
+            report = simulate(folder, nx=32, ny=64, steps=100, every=100,
+                              make_animation=False)
+            phi = np.load(Path(folder)/"snapshots.npz")["phi"][-1]
+        np.testing.assert_allclose(np.array(browser["phi"]).reshape(64, 32),
+                                   phi, atol=2e-12, rtol=1e-10)
+        self.assertAlmostEqual(browser["interfaceLow"], report["last_saved_interface_low"],
+                               places=10)
+        self.assertNotIn("passed", browser)
+
     def test_same_discrete_evolution(self):
         for name in ("poiseuille", "couette", "shear-wave", "taylor-green"):
             with self.subTest(case=name):

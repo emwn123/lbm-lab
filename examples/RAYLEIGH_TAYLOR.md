@@ -12,7 +12,7 @@ Heavy material initially lies above light material. A sinusoidal displacement gr
 python -m lbm_lab.rayleigh_taylor --output rt-run
 ```
 
-Python 3.11+ is required; install the package as described in the main README. Default output includes an animated GIF, a four-panel figure, interface/conservation diagnostics, CSV history, NPZ phase snapshots, parameters and a report. A new or empty output directory is required. Computation is in Python, not in the browser demo.
+Python 3.11+ is required; install the package as described in the main README. Default output includes an animated GIF, a four-panel figure, interface/conservation diagnostics, CSV history, NPZ phase snapshots, parameters and a report. A new or empty output directory is required. The browser also implements this model in JavaScript; choose Rayleigh–Taylor in the flow selector and click Run experiment. The recorded animation below remains the original 5000-step Python reference.
 
 ```sh
 # Same geometry, zero gravity; capillary forces remain active.
@@ -81,3 +81,11 @@ Celani et al., *Phase-field model for the Rayleigh-Taylor instability of immisci
 这是低 Atwood 数、Boussinesq 近似下的探索算例：密度差只进入浮力，不是变密度两流体求解器。界面由守恒 Cahn-Hilliard 方程描述，速度由 D2Q9-BGK 求解。已检查基本守恒、无重力和无扰动对照，尚未完成网格、界面厚度敏感性或公开基准验证。
 
 红色代表重相，蓝色代表轻相。默认运行显示界面扰动增长，并保留真实误差和相场超调。动画来自已保存的 Python 计算，不是网页实时两相模拟。`lbm-lab all` 仍只运行四个具有解析参考的单相案例。
+
+## Live browser experiment
+
+The browser defaults to 64 × 128 cells and 10000 steps. Choose 5000, 10000, 20000 or 30000 steps, and gravity 0, 0.0002 or 0.0004. Atwood=0.05, tau=0.65, amplitude=2, M=2, beta=0.001 and kappa=0.002 are fixed. Smaller widths are available, but shortening the wavelength with fixed surface tension can suppress growth. These controls do not define a grid-refinement study.
+
+The field is recomputed in a worker, with progress every 100 steps. Stop cancels the worker. Completed-run JSON contains final phase, sampled interface heights, conservation history and configuration; it has no benchmark `passed` flag. A phase or Mach guard terminates a run and keeps the last displayed sample marked incomplete. A completed run is not a quantitative validation.
+
+A local Node.js run at the default geometry and gravity completed 20000 steps. Maximum Mach was 0.0629992, maximum relative fluid mass drift 1.7482e-12, and maximum sampled mean phase drift 9.98e-16. At step 10000 the zero-crossing bounds were [3.5757, 124.4243]; at 20000 they were [0.7153, 127.2847]. Wall interaction therefore matters at late times. The 30000-step choice is an optional duration, not a claim of validated late-time physics or stability for every setting. The automated cross-language check compares the phase field and interface bounds after 100 steps at 32 × 64.
