@@ -4,6 +4,8 @@ Three small flow problems for learning and checking the lattice Boltzmann method
 
 [中文说明](README.zh-CN.md) · [Numerical method](docs/method.md) · [Results](examples/RESULTS.md)
 
+[Interactive browser experiments](demo/index.html) · [Poiseuille refinement study](examples/CHANNEL_STUDY.md)
+
 | Case | Flow | What it checks |
 |---|---|---|
 | Poiseuille | Force-driven flow between fixed plates | Body force, wall placement, parabolic velocity profile |
@@ -13,6 +15,10 @@ Three small flow problems for learning and checking the lattice Boltzmann method
 ![Three analytical comparisons](examples/overview.png)
 
 ## Install and run
+
+For a browser-only introduction, open `demo/index.html` from a downloaded checkout. It runs the three experiments locally, with adjustable parameters, live diagnostics and downloadable JSON results. The JavaScript solver is cross-checked against Python. See [browser instructions and hosting](demo/README.md). GitHub's file viewer displays HTML source; an administrator can enable GitHub Pages to serve the page.
+
+![Interactive experiment](examples/interactive-preview.png)
 
 Requires Python 3.11 or later. From the project folder:
 
@@ -69,6 +75,14 @@ python -m lbm_lab.refinement --output refinement-run
 The study runs the shear wave on 16, 32 and 64 nodes in y. Velocity scales as 1/N and duration as N², keeping Reynolds number and viscous time fixed. The checked-in results show approximately second-order profile-error reduction for this case. The 16-node case misses the 1% profile criterion and is retained in the report. The study command returns success if errors decrease; individual benchmark acceptance is reported separately. See [results](examples/RESULTS.md).
 
 ## Teaching sequence
+
+For the channel's grid and relaxation-time study, run:
+
+```sh
+python -m lbm_lab.channel_study --output channel-study-run
+```
+
+This compares nine steady cases at fixed Reynolds number. Parameters, measured errors and original output are in the [study report](examples/CHANNEL_STUDY.md).
 
 1. Run Couette flow and locate the two walls relative to the fluid nodes.
 2. Run Poiseuille flow and compare the effect of the body force with the moving wall.

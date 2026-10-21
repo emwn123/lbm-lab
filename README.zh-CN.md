@@ -10,6 +10,8 @@
 
 ## 安装与运行
 
+无需安装 Python 的交互入口：下载仓库后打开 `demo/index.html`。可调整网格、松弛时间与速度，运行三个算例、查看误差并下载 JSON。网页全部在本机计算；浏览器实现与 Python 求解器做交叉测试。[交互说明及 GitHub Pages 设置](demo/README.md)
+
 需要 Python 3.11 或以上版本。在项目目录运行：
 
 ```powershell
@@ -48,6 +50,14 @@ py -m lbm_lab.refinement --output refinement-run
 参数表、公式与数值限制见 [英文说明](README.md) 和 [方法文档](docs/method.md)。已运行的结果见 [案例报告](examples/RESULTS.md)。这三个算例用于基础流动验证，不包含多相、热传递或复杂几何流动。
 
 ## 测试
+
+新增 Poiseuille 网格与松弛时间对比：
+
+```powershell
+py -m lbm_lab.channel_study --output channel-study-run
+```
+
+九组算例固定 Reynolds 数，达到稳态后比较速度误差。参数与结果见 [收敛报告](examples/CHANNEL_STUDY.md)。
 
 ```powershell
 py -m unittest discover -s tests -v

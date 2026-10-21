@@ -1,0 +1,14 @@
+{
+  "case": "poiseuille",
+  "ny": 24,
+  "nx": 8,
+  "tau": 1.0,
+  "speed": 0.022222222222222223,
+  "force_density_x": 5.1440329218106995e-05,
+  "max_steps": 8640,
+  "wave_steps": 400,
+  "check_every": 100,
+  "steady_tolerance": 1e-10,
+  "python": "3.14.0",
+  "numpy": "2.5.4"
+}
