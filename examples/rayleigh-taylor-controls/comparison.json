@@ -1,0 +1,17 @@
+{
+  "Perturbed + gravity": {
+    "step": 1000.0,
+    "initial_interface_half_span": 1.9976884363622815,
+    "final_interface_half_span": 2.83319320640118
+  },
+  "No gravity": {
+    "step": 1000.0,
+    "initial_interface_half_span": 1.9976884363622815,
+    "final_interface_half_span": 1.6404182849465236
+  },
+  "Flat + gravity": {
+    "step": 1000.0,
+    "initial_interface_half_span": 0.0,
+    "final_interface_half_span": 0.0
+  }
+}

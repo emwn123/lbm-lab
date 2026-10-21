@@ -3,4 +3,4 @@
 from .solver import D2Q9
 
 __all__ = ["D2Q9"]
-__version__ = "0.3.0"
+__version__ = "0.4.0"

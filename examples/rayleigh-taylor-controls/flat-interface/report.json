@@ -1,0 +1,14 @@
+{
+  "completed_steps": 1000,
+  "requested_steps": 1000,
+  "failure": null,
+  "max_sampled_phase_mean_drift": 4.440892098500626e-16,
+  "max_sampled_relative_mass_drift": 8.881784197001252e-14,
+  "max_sampled_mach": 3.4281345364761287e-07,
+  "initial_interface_low": 64.0,
+  "initial_interface_high": 64.0,
+  "last_saved_interface_low": 63.99999999999999,
+  "last_saved_interface_high": 63.99999999999999,
+  "last_saved_step": 1000,
+  "validation_status": "exploratory demonstration; no benchmark pass claimed"
+}

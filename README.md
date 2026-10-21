@@ -12,6 +12,8 @@ Four small flow problems for learning and checking the lattice Boltzmann method.
 
 [Guided experiment cards](docs/EXPERIMENTS.md) · [Taylor-Green vortex](examples/TAYLOR_GREEN.md)
 
+An additional [Rayleigh-Taylor experiment](examples/RAYLEIGH_TAYLOR.md) couples a diffuse interface to low-Atwood buoyancy. It is a separate exploratory Python case with recorded animation and controls, rather than an analytical benchmark or browser simulation.
+
 | Case | Flow | What it checks |
 |---|---|---|
 | Poiseuille | Force-driven flow between fixed plates | Body force, wall placement, parabolic velocity profile |

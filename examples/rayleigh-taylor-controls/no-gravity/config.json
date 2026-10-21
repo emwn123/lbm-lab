@@ -1,0 +1,16 @@
+{
+  "nx": 64,
+  "ny": 128,
+  "steps": 1000,
+  "every": 100,
+  "tau": 0.65,
+  "atwood": 0.05,
+  "gravity": 0,
+  "amplitude": 2.0,
+  "mobility": 2.0,
+  "beta": 0.001,
+  "kappa": 0.002,
+  "model": "Boussinesq CH / D2Q9-BGK, exploratory",
+  "python": "3.14.0",
+  "numpy": "2.5.4"
+}

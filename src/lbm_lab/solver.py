@@ -19,23 +19,35 @@ def equilibrium(rho, ux, uy):
 class D2Q9:
     """Periodic x; periodic y or halfway bounce-back horizontal walls.
 
-    force_x is a constant force density, not acceleration. Physical velocity
+    Forces are force densities, not accelerations, and may vary in space. Physical velocity
     includes the half-force correction. All boundaries are grid aligned.
     """
 
-    def __init__(self, nx=8, ny=24, tau=0.8, *, walls=False, top_speed=0.0, force_x=0.0):
+    def __init__(self, nx=8, ny=24, tau=0.8, *, walls=False, top_speed=0.0,
+                 force_x=0.0, force_y=0.0):
         if any(isinstance(n, bool) or not isinstance(n, int) or n < 4 for n in (nx, ny)):
             raise ValueError("nx and ny must be integers >= 4")
         if not math.isfinite(tau) or tau <= 0.5:
             raise ValueError("tau must be finite and greater than 0.5")
-        if not math.isfinite(top_speed) or not math.isfinite(force_x):
-            raise ValueError("wall speed and force must be finite")
+        if not math.isfinite(top_speed):
+            raise ValueError("wall speed must be finite")
         if top_speed and not walls:
             raise ValueError("moving wall requires walls=True")
         self.nx, self.ny, self.tau = nx, ny, tau
         self.nu = (tau - 0.5) / 3
-        self.walls, self.top_speed, self.force_x = walls, top_speed, force_x
+        self.walls, self.top_speed = walls, top_speed
+        self.set_force(force_x, force_y)
         self.initialize()
+
+    def set_force(self, force_x=0.0, force_y=0.0):
+        """Set finite force fields on the fluid grid, including scalar inputs."""
+        shape = (self.ny, self.nx)
+        fx = np.broadcast_to(np.asarray(force_x, dtype=float), shape)
+        fy = np.broadcast_to(np.asarray(force_y, dtype=float), shape)
+        if not np.isfinite(fx).all() or not np.isfinite(fy).all():
+            raise ValueError("forces must be finite")
+        self.force_x, self.force_y = fx.copy(), fy.copy()
+        self._has_force = bool(np.any(fx) or np.any(fy))
 
     def initialize(self, ux=0.0, uy=0.0, rho=1.0):
         """Initialize density and the requested macroscopic velocity."""
@@ -47,7 +59,7 @@ class D2Q9:
             raise ValueError("initial velocity must be finite")
         if not np.isfinite(rho).all() or (rho <= 0).any():
             raise ValueError("initial density must be finite and positive")
-        self.f = equilibrium(rho, ux - self.force_x/(2*rho), uy)
+        self.f = equilibrium(rho, ux - self.force_x/(2*rho), uy - self.force_y/(2*rho))
 
     def macroscopic(self):
         rho = self.f.sum(axis=0)
@@ -55,16 +67,18 @@ class D2Q9:
             raise FloatingPointError("invalid populations or density")
         momentum_x = np.einsum("i,iyx->yx", C[:, 0], self.f)
         momentum_y = np.einsum("i,iyx->yx", C[:, 1], self.f)
-        return rho, (momentum_x + self.force_x/2) / rho, momentum_y / rho
+        return rho, (momentum_x + self.force_x/2) / rho, (momentum_y + self.force_y/2) / rho
 
     def step(self):
         rho, ux, uy = self.macroscopic()
         omega = 1 / self.tau
         post = self.f - omega * (self.f - equilibrium(rho, ux, uy))
-        if self.force_x:
+        if self._has_force:
             cu = C[:, 0, None, None] * ux + C[:, 1, None, None] * uy
-            source = W[:, None, None] * (1 - omega/2) * self.force_x * (
-                3*(C[:, 0, None, None] - ux) + 9*cu*C[:, 0, None, None])
+            source = W[:, None, None] * (1 - omega/2) * (
+                3*((C[:, 0, None, None]-ux)*self.force_x +
+                   (C[:, 1, None, None]-uy)*self.force_y) +
+                9*cu*(C[:, 0, None, None]*self.force_x + C[:, 1, None, None]*self.force_y))
             post += source
         # Push streaming. Wrapped wall-crossing values are replaced below.
         for i, (cx, cy) in enumerate(C):

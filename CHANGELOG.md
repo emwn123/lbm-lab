@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
+
+- Add an exploratory low-Atwood Rayleigh-Taylor case coupling Cahn-Hilliard transport and Boussinesq LBM flow.
+- Extend Guo forcing to finite spatial x/y force fields and test vertical-force momentum and phase conservation.
+- Include a recorded 5000-step run, matched early-time controls, interface snapshots and diagnostics.
+- Keep the experimental case separate from the four analytical benchmark checks.
 
 - Add a direct online entry and a bilingual first-experiment guide.
 - Add trial-feedback and bug-report forms, including feedback context.
